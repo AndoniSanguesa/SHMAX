@@ -1,0 +1,7 @@
+timit/
+pydata/
+venv/
+.github/
+.idea/
+__pycache__/
+S1Result/
