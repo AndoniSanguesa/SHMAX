@@ -17,8 +17,8 @@ if not skip_c[0]:
 for i in range(1,6):
     print(f"*** S{i} LAYER ***")
     if not skip_s[i]:
-        SHMAX_3Ds(skip_ss[i], skip_t[i], skip_i[i], num_bases[i], bases_size[i], num_samp[i], s_stride[i], f"C{i-1}Result", f"S{i}Result")
+        SHMAX_3Ds(skip_ss[i], skip_t[i], skip_i[i], num_bases[i], bases_size[i], num_samp[i], s_stride[i], f"C{i}Result/", f"S{i+1}Result/")
 
     print(f"*** C{i} LAYER ***")
     if not skip_c[i]:
-        SHMAX_C(skip_p[i], pool_ratio[i], c_stride[i], f"S{i}Result", f"C{i}Result")
+        SHMAX_C(skip_p[i], pool_ratio[i], c_stride[i], f"S{i+1}Result/", f"C{i+1}Result/")

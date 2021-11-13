@@ -1,11 +1,11 @@
 #       Layer: 1     2      3      4      5      6     #
 #------------------------------------------------------#
-skip_ss =     [1,    0,     0,     0,     0,     0]    # Skips image sampling
-skip_s =      [0,    0,     0,     0,     0,     0]    # Skip S layers
-skip_c =      [0,    0,     0,     0,     0,     0]    # Skip C layers
-skip_t =      [1,    0,     0,     0,     0,     0]    # Skip Training
-skip_i =      [0,    0,     0,     0,     0,     0]    # Skip Inference
-skip_p =      [0,    0,     0,     0,     0,     0]    # Skip Pooling
+skip_ss =     [1,    1,     0,     0,     0,     0]    # Skips image sampling
+skip_s =      [1,    0,     0,     0,     0,     0]    # Skip S layers
+skip_c =      [1,    0,     0,     0,     0,     0]    # Skip C layers
+skip_t =      [1,    1,     0,     0,     0,     0]    # Skip Training
+skip_i =      [1,    0,     0,     0,     0,     0]    # Skip Inference
+skip_p =      [1,    0,     0,     0,     0,     0]    # Skip Pooling
 
 num_bases =   [1e2,  2e2,   4e2,   5e2,   5e2,   5e2]  # Number of bases
 bases_size =  [10,   10,    10,    10,    10,    10]   # Size of bases

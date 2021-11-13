@@ -5,6 +5,7 @@ import wave
 import contextlib
 from pycochleagram.cochleagram import cochleagram
 from skimage.util import view_as_windows as viewW
+import random
 
 
 def col2im(image_blocks, block_size, image_size):
@@ -16,6 +17,7 @@ def col2im(image_blocks, block_size, image_size):
     :param image_size: (ndarray) size of image to fit blocks into
     :return:
     """
+
     m,n = block_size
     mm,nn = image_size
     return image_blocks.reshape(nn-n+1,mm-m+1).T
@@ -45,18 +47,20 @@ def sample_images_3d(sample_size, base_size, path):
     """
 
     print(f"*** Generating {sample_size} 3D samples from data ***")
-    files = list(filter(lambda x: x.startswith("pool"), os.listdir(path)))
-    n = min(len(files), 5000)
-    samples_per_image = sample_size / n
+    files = list(filter(lambda x: x.startswith("y"), os.listdir(path)))
+    random.seed(0)
+    random.shuffle(files)
+    n = 100
+    samples_per_image = int(sample_size // n)
     test_file = np.load(path+"/"+files[0])
-    X = np.zeros(base_size^2 * test_file.shape[2], sample_size)
+    X = np.zeros((base_size**2 * test_file.shape[2], int(sample_size)))
 
     for i in range(n):
         print(f"{round((i/n)*100, 0)}%")
         file = files[i]
         data = np.load(path+"/"+file)
-        x_vals = np.floor(np.random.rand(samples_per_image) * (data.shape[0] - base_size)).astype(int)
-        y_vals = np.floor(np.random.rand(samples_per_image) * (data.shape[1] - base_size)).astype(int)
+        x_vals = np.floor(np.random.rand(samples_per_image) * (data.shape[0] - int(base_size))).astype(int)
+        y_vals = np.floor(np.random.rand(samples_per_image) * (data.shape[1] - int(base_size))).astype(int)
         for j in range(samples_per_image):
             patch = data[x_vals[j]:x_vals[j]+base_size, y_vals[j]:y_vals[j]+base_size, :]
             X[:,i*samples_per_image+j] = np.reshape(patch, ((base_size**2)*data.shape[2]))
@@ -75,8 +79,10 @@ def sample_images_2d(sample_size, base_size, path):
     """
 
     print(f"*** Generating {sample_size} 2D samples from data ***")
+    random.seed(0)
     files = os.listdir(path)
-    n = min(len(files), 5000)
+    random.shuffle(files)
+    n = 100
     samples_per_image = int(sample_size // n)
     X = np.zeros((base_size**2, int(sample_size)))
 

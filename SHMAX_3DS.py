@@ -1,8 +1,9 @@
 from util import *
-from spams import trainDL
+from spams import trainDL_Memory
 import os
 from cupyx.scipy.signal import convolve
 import cupy
+import time
 
 
 def SHMAX_3Ds(skip_sampling, skip_training, skip_inference, num_base, base_size, sample_size, stride, data_path, result_path):
@@ -31,19 +32,19 @@ def SHMAX_3Ds(skip_sampling, skip_training, skip_inference, num_base, base_size,
         else:
             sample = sample_images_3d(sample_size, base_size, data_path)
             np.save(f"{result_path}/sample_{num_base}_{sample_size}_{base_size}.npy", sample)
-        base = trainDL(sample, K=num_base, lambda1=1e0, iter=5e3, mode=1)
+        base = trainDL_Memory(sample, K=num_base, lambda1=1e0, iter=5e3, mode=1)
         np.save(f"{result_path}/base_{num_base}_{sample_size}_{base_size}.npy", base)
 
     print("*** Calculated Responses ***")
     if not skip_inference:
         files = os.listdir(data_path)
-        for i in range(len(files)):
+        for i in range(10, len(files)):
             print(f"{round((i / len(files)) * 100, 3)}%")
             file = files[i]
             data = cupy.array(np.load(data_path+"/"+file))
-            w = np.zeros(data.shape[0]-base_size+1, data.shape[2]-base_size+1, num_base)
-            for j in range(num_base):
-                kernel = cupy.array(np.reshape(base[:, j], (base_size, base_size, data.shape[2])))
-                w[:,:,j] = convolve(data, kernel, mode="valid", method="direct").get()
+            w = np.zeros((int(data.shape[0]-base_size+1), int(data.shape[1]-base_size+1), int(num_base)))
+            for j in range(int(num_base)):
+                kernel = cupy.array(np.reshape(base[:, j], (int(base_size), int(base_size), data.shape[2])))
+                w[:,:,j] = np.reshape(convolve(data, kernel, mode="valid", method="direct").get(), w.shape[:2])
             w = w[::stride, ::stride, :]
             np.save(f"{result_path}/w_{i}.npy", w)

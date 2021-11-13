@@ -16,14 +16,14 @@ def SHMAX_C(skip_pooling, pool_size, stride, data_path, result_path):
 
     print("*** Calculating Responses ***")
     if not skip_pooling:
-        files = os.listdir(data_path)
+        files = list(filter(lambda x: x.startswith("w"), os.listdir(data_path)))
         for i in range(len(files)):
             print(f"{round((i / len(files)) * 100, 3)}%")
             file = files[i]
             data = np.load(data_path+"/"+file)
             y = np.zeros((data.shape[0]-1, data.shape[1]-1, data.shape[2]))
             for j in range(data.shape[2]):
-                y[:,:,j] = col2im(np.max(im2col(data[:,:,j], [pool_size, pool_size]), 1), [pool_size, pool_size], data[:,:,j].shape)
+                y[:,:,j] = col2im(np.max(im2col(data[:,:,j], [pool_size, pool_size]), 0), [pool_size, pool_size], data[:,:,j].shape)
             y = y[::stride, ::stride, :]
             os.makedirs(os.path.dirname(result_path), exist_ok=True)
-            np.save(f"{result_path}/y_{i}.npy")
+            np.save(f"{result_path}/y_{i}.npy", y)

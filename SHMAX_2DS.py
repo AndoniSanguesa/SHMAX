@@ -2,6 +2,7 @@ from spams import trainDL
 from util import *
 from cupyx.scipy.signal import convolve
 import cupy
+import random
 
 def SHMAX_2Ds(skip_sampling, skip_training, skip_inference, num_base, base_size, sample_size, stride, data_path, result_path):
     """
@@ -35,8 +36,10 @@ def SHMAX_2Ds(skip_sampling, skip_training, skip_inference, num_base, base_size,
 
     print("*** Calculating Responses ***")
     if not skip_inference:
+        random.seed(0)
         files = os.listdir(data_path)
-        for i in range(len(files)):
+        random.shuffle(files)
+        for i in range(100):
             print(f"{round((i / len(files)) * 100, 3)}%")
             file = files[i]
             coch_info = load_coch_from_file(data_path+"/"+file)
