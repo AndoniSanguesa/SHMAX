@@ -21,7 +21,6 @@ def plot_psi_but_bad(psi):
     cell_height = 25
     cell_width = 5
     num_cats = psi.shape[0]
-    print(num_cats)
     psi_plot = PIL.Image.new("L", (psi.shape[1]*cell_width, psi.shape[0]*cell_height))
 
     for i in range(psi.shape[0]):
@@ -92,7 +91,6 @@ def sample_images_3d(sample_size, base_size, path):
     X = np.zeros((base_size**2 * test_file.shape[2], int(sample_size)))
 
     for i in range(n):
-        print(f"{round((i/n)*100, 0)}%")
         file = files[i]
         data = np.load(path+"/"+file)
         x_vals = np.floor(np.random.rand(samples_per_image) * (data.shape[0] - int(base_size))).astype(int)
@@ -123,7 +121,6 @@ def sample_images_2d(sample_size, base_size, path):
     X = np.zeros((base_size**2, int(sample_size)))
 
     for i in range(n):
-        print(f"{round((i / n) * 100, 3)}%")
         file = files[i]
         coch_info = np.load(path+"/"+file)
         features = generate_features(coch_info["waveform"], sr=16000)
@@ -190,7 +187,6 @@ def generate_mat_for_all_data_in_dir(data_path, result_path):
                         file_name = f"{speaker_name}_{file[:-8]}.mat"
                         file_path = speaker_path + file
                         save_features_as_mat(file_path, f"{result_path}/{file_name}", sr=16000)
-                        print(cnt)
 
 
 def save_features_as_mat(data_path, file_path, n_features=194, sr=1):
@@ -305,7 +301,6 @@ def plot_coch(coch, wav_len=None, name=None):
             zs.append(coch[y_val][x_val])
 
     perm = sorted(list(range(len(xs))), key=lambda k: -ys[k])
-    print(perm[:100])
     new_xs = [xs[i] for i in perm]
     new_ys = [ys[i] for i in perm]
     new_zs = [zs[i] for i in perm]

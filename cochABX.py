@@ -85,7 +85,6 @@ def abx_testing(data_path, categories, num_categories, result_path=None, method=
     for file in os.listdir(data_path):
         phone = file.split("_")[0]
         category_pops[categories[phone]].append(file)
-    total = (num_categories*iter*(num_categories-1)*iter)
     for i in range(num_categories):
         for ind in range(iter):
             a = loadmat(f"{data_path}/{np.random.choice(category_pops[i])}")['data'].T
@@ -97,7 +96,6 @@ def abx_testing(data_path, categories, num_categories, result_path=None, method=
                 if j == i:
                     continue
                 for ind2 in range(iter):
-                    print(((i*iter*num_categories*iter)+(ind*num_categories*iter)+(j*iter)+ind2)/total)
                     b = loadmat(f"{data_path}/{np.random.choice(category_pops[j])}")['data'].T
 
                     dist_from_b = dtw(b, x, method).normalizedDistance
@@ -135,7 +133,6 @@ def general_classification_abx_testing(data_path, categories, num_categories, re
     for file in os.listdir(data_path):
         phone = file.split("_")[0]
         category_pops[categories[phone]].append(file)
-    total = (num_categories*iter*(num_categories-1))
     for i in range(num_categories):
         for ind in range(iter):
             a = loadmat(f"{data_path}/{np.random.choice(category_pops[i])}")['data'].T
@@ -148,7 +145,6 @@ def general_classification_abx_testing(data_path, categories, num_categories, re
                 if j == i:
                     distances.append(dist_from_a)
                     continue
-                print(((i*iter*(num_categories-1))+(ind*(num_categories-1))+j)/total)
                 b = loadmat(f"{data_path}/{np.random.choice(category_pops[j])}")['data'].T
 
                 dist_from_b = dtw(b, x, method).normalizedDistance

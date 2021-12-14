@@ -40,7 +40,6 @@ def generate_cochs_for_all_files(path, train, region, speaker, decimation_factor
             if full_path.endswith("TXT"):
                 text = open(full_path).readlines()
             elif full_path.endswith("wav"):
-                print(full_path)
                 coch = create_cochleogram(full_path, decimation_factor)
                 duration = get_wav_duration(full_path)
                 wav_path = full_path

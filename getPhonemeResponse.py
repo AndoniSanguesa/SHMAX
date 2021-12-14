@@ -119,7 +119,6 @@ def get_phoneme_response(corpus_data_path, SHMAX_data_path, save_path=None, num_
     prog = 0
 
     for file in os.listdir(SHMAX_data_path):
-        print(prog / len(os.listdir(SHMAX_data_path)))
         if "base" in file:
             continue
 

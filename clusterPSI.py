@@ -25,12 +25,9 @@ def cluster_psi(psi, save_path=None):
     phoneme_idx = np.empty_like(phoneme_permute)
     unit_idx = np.empty_like(unit_permute)
 
-    print(phoneme_permute)
-
     phoneme_idx[phoneme_permute] = np.arange(len(phoneme_permute))
     unit_idx[unit_permute] = np.arange(len(unit_permute))
 
-    print(phoneme_idx)
     psi = psi[phoneme_idx, :]
     psi = psi[:, unit_idx]
 
