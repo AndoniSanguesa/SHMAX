@@ -8,7 +8,6 @@ calc = LyonCalc()
 
 ### NOTE: lyon library only works on Linux!!! ###
 
-
 def generate_cochs_for_all_files(path, train, region, speaker, decimation_factor=64):
     """
     Iterates through all files in the directory specified and generates cochleograms and
@@ -53,17 +52,18 @@ def generate_cochs_for_all_files(path, train, region, speaker, decimation_factor
         save_coch_to_file(coch, duration, wav_path, train, region, speaker, phone, words, text, datum, waveform)
 
 
-def generate_cochs_for_all_data_in_dir(decimation_factor=64):
+
+def generate_cochs_for_all_data_in_dir(path, decimation_factor=64):
     """
     Recursively generates cochleograms for all wav files in the specified directory or its
-    subdirectories
+    subdirectories. (Makes python readable data)
 
     :param path: (String) path to desired directory
     :param decimation_factor: (int) how much to decimate the model output
     :return: None
     """
 
-    for train_test_file in os.listdir("./timit/data/"):
+    for train_test_file in os.listdir(path):
         train_test_path = "./timit/data/"+train_test_file+"/"
         train = train_test_file == "TRAIN"
         for region_file in os.listdir(train_test_path):
@@ -87,4 +87,3 @@ def create_cochleogram(path, decimation_factor=64):
     coch = calc.lyon_passive_ear(waveform, sample_rate, decimation_factor)
     return coch
 
-generate_cochs_for_all_data_in_dir()

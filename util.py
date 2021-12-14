@@ -2,10 +2,46 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import wave
+import matplotlib
 import contextlib
 from pycochleagram.cochleagram import cochleagram
+from scipy.io import savemat, wavfile
 from skimage.util import view_as_windows as viewW
 import random
+import PIL
+
+
+def plot_psi_but_bad(psi):
+    """
+    Plots PSI graph but done in a horrible horrible way. I could not get pyplot to properlly strech the image. 
+
+    :param psi: PSI matrix of size m x n where PSI(i, j) represents the selectivity towards phone j for unit i
+    :return: None
+    """
+    cell_height = 25
+    cell_width = 5
+    num_cats = psi.shape[0]
+    print(num_cats)
+    psi_plot = PIL.Image.new("L", (psi.shape[1]*cell_width, psi.shape[0]*cell_height))
+
+    for i in range(psi.shape[0]):
+        for j in range(psi.shape[1]):
+            shade = int((psi[i, j]/num_cats) * 255)
+            psi_plot.paste(PIL.Image.new("L", (cell_width, cell_height), shade), (j*cell_width, i*cell_height))
+    
+    psi_plot.save("AnalysisResults/psi_plot.png")
+
+
+def plot_psi(psi):
+    """
+    Plots PSI graph.
+
+    :param psi: PSI matrix of size m x n where PSI(i, j) represents the selectivity towards phone j for unit i
+    :return: None
+    """
+    plt.matshow(psi, cmap="binary")
+
+    plt.show()
 
 
 def col2im(image_blocks, block_size, image_size):
@@ -124,7 +160,53 @@ def generate_features(waveform, n_features=194, sr=1):
     :param sr: (int) sampling rate that original wav was recorded in
     :return: (ndarray) list of subbands representing features
     """
-    return cochleagram(waveform, sr, n_features, 0, 7630, 1, strict=False, ret_mode="subband")
+    return cochleagram(waveform, sr, n_features, 0, 7630, 1, strict=False, ret_mode="subband", no_hp_lp_filts=True)
+
+
+def generate_mat_for_all_data_in_dir(data_path, result_path):
+    """
+    Generates features and saves them as .mat files to desired path for each wav file in the path or subpaths.
+    (Makes matlab readable data)
+
+    :param data_path: Path to collect wav files from
+    :param result_path: Path to save .mat files to
+    :return: None
+    """
+
+    cnt = 0
+
+    for train_test_file in os.listdir(data_path):
+        train_test_path = data_path + train_test_file + "/"
+        train_name = "train" if train_test_file == "TRAIN" else "test"
+        for region_file in os.listdir(train_test_path):
+            region_path = train_test_path + region_file + "/"
+            region_name = f"{train_name}_{region_file[-1]}"
+            for speaker_file in os.listdir(region_path):
+                speaker_path = region_path + speaker_file + "/"
+                speaker_name = f"{region_name}_{speaker_file}"
+                for file in os.listdir(speaker_path):
+                    if file.endswith(".wav"):
+                        cnt += 1
+                        file_name = f"{speaker_name}_{file[:-8]}.mat"
+                        file_path = speaker_path + file
+                        save_features_as_mat(file_path, f"{result_path}/{file_name}", sr=16000)
+                        print(cnt)
+
+
+def save_features_as_mat(data_path, file_path, n_features=194, sr=1):
+    """
+    Generates feature vector from cochleogram subbands and saves them to a provided path as a .mat file
+
+    :param data_path: (String) path to wav file
+    :param file_path: (String) path to save .mat file to
+    :param n_features: (int) number of features/subbands desired
+    :param sr: (int) sampling rate that original wav was recorded in
+    :return: None
+    """
+
+    _, waveform = wavfile.read(data_path)
+    to_mat = generate_features(waveform, n_features, sr)
+    savemat(file_path, {"data": to_mat})
 
 
 def save_coch_to_file(coch, wav_len=None, wav_path=None, train=None, region=None, speaker=None,
@@ -170,6 +252,25 @@ def save_coch_to_file(coch, wav_len=None, wav_path=None, train=None, region=None
              waveform=waveform)
 
 
+def plot_wav(wav_path):
+    """
+    Plots a wav file
+    
+    :param wav_path: path to desired wav file 
+    :return: None
+    """
+
+    sampleRate, audioBuffer = wavfile.read(wav_path)
+
+    duration = len(audioBuffer) / sampleRate
+
+    time = np.arange(0, duration, 1 / sampleRate)  # time vector
+
+    plt.plot(time, audioBuffer)
+    plt.xlabel('Time [s]')
+    plt.ylabel('Amplitude')
+    plt.show()
+
 def load_coch_from_file(path):
     """
     Loads cochleogram and sample rate(if specified) from file.
@@ -198,17 +299,23 @@ def plot_coch(coch, wav_len=None, name=None):
     y_size, x_size = coch.shape
 
     for y_val in range(y_size):
-        for x_val in range(x_size):
+        for x_val in range(0, x_size, 20):
             xs.append(x_val/x_size * wav_len if wav_len else x_val)
             ys.append(y_val)
             zs.append(coch[y_val][x_val])
 
-    plt.scatter(xs, ys, c=zs, cmap="viridis")
-    plt.xlabel("seconds")
+    perm = sorted(list(range(len(xs))), key=lambda k: -ys[k])
+    print(perm[:100])
+    new_xs = [xs[i] for i in perm]
+    new_ys = [ys[i] for i in perm]
+    new_zs = [zs[i] for i in perm]
+
+    plt.scatter(new_xs, new_ys, c=new_zs, cmap="viridis", s=np.array(new_zs)*20)
+    plt.ylabel("Frequency [mHz]")
+    plt.xlabel("Time [sec]")
     if name:
         plt.title(f"{name}")
     else:
         plt.title(f"Cochleogram")
     plt.show()
 
-coch_info = load_coch_from_file("pydata/TEST/test-1-FAKS0-SA2.npz")

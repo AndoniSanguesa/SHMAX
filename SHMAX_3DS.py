@@ -38,7 +38,7 @@ def SHMAX_3Ds(skip_sampling, skip_training, skip_inference, num_base, base_size,
     print("*** Calculated Responses ***")
     if not skip_inference:
         files = os.listdir(data_path)
-        for i in range(10, len(files)):
+        for i in range(21  , len(files)):
             print(f"{round((i / len(files)) * 100, 3)}%")
             file = files[i]
             data = cupy.array(np.load(data_path+"/"+file))

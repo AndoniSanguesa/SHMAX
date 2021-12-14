@@ -16,3 +16,12 @@ C3Result/
 C4Result/
 C5Result/
 C6Result/
+SHMAX_AuditoryPathway/
+tmpModel/
+src_release/
+test_release/
+matdata/
+phone_mats/
+build/
+AnalysisResults/
+phone_mats/

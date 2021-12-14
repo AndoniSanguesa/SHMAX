@@ -3,6 +3,8 @@ from util import *
 from cupyx.scipy.signal import convolve
 import cupy
 import random
+import time
+
 
 def SHMAX_2Ds(skip_sampling, skip_training, skip_inference, num_base, base_size, sample_size, stride, data_path, result_path):
     """
@@ -46,7 +48,9 @@ def SHMAX_2Ds(skip_sampling, skip_training, skip_inference, num_base, base_size,
             features = cupy.array(generate_features(coch_info["waveform"], sr=16000))
             w = np.zeros((features.shape[0]-base_size+1, features.shape[1]-base_size+1, int(num_base)))
             for j in range(int(num_base)):
+                start = time.perf_counter()
                 kernel = cupy.array(np.reshape(base[:, j], (int(base_size), int(base_size))))
                 w[:,:,j] = convolve(features, kernel, mode="valid", method="direct").get()
+                end = time.perf_counter()
+                print(end - start)
             w = w[::stride, ::stride, :]
-            np.save(f"{result_path}/w_{i}.npy", w)
