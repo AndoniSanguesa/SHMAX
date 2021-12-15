@@ -1,3 +1,5 @@
+This work is based on earlier work in [Zhang et al. (2019)](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006766#sec013)
+
 ## Generating Input Cochleagrams
 
 1. Download the [TIMIT corpus](https://deepai.org/dataset/timit).
