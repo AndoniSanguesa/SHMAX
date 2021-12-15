@@ -32,7 +32,7 @@ want to look into using the Matlab Auditory Toolbox instead.__
    4. Note: Files will be of type `.mat`
 2. Create categories to perform ABX testing by
    1. Create a 2D list such that each sublist contains the phoneme names of a category. e.g. `[['aa', 'ae', 'ah'], ['ao', 'aw', 'ax'], ...]`
-   2. Pass this list to `convert_category_list_to_dict(cat_list)` and store the resulting dictionary.
+   2. Pass this list to `cochABX.convert_category_list_to_dict(cat_list)` and store the resulting dictionary.
 
 ### Perform Pair-Wise Machine ABX Testing on Input Cochleagrams
  
