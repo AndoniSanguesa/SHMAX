@@ -92,7 +92,7 @@ def remap_times(phone_times, timit_len, data_len):
     return list(map(mod_phn, phone_times))
 
 
-def get_phoneme_response(corpus_data_path, SHMAX_data_path, save_path=None, num_units=500, num_categories=52, method="max",
+def get_phoneme_response(corpus_data_path, SHMAX_data_path, save_path=None, num_units=500, num_categories=52,
                          categories=None):
     """
     Gets the response to all phonemes for all units of the current SHMAX model output.
@@ -102,10 +102,6 @@ def get_phoneme_response(corpus_data_path, SHMAX_data_path, save_path=None, num_
     :param save_path: (String) Path to save responses to. Does not save if None.
     :param num_units: (int) Number of units present in SHMAX model
     :param num_categories: (int) Number of categories represented by the `categories` parameter
-    :param method: (String) Method of determining unit activation
-            given n values for a given unit and time, activation for that unit at that time is calculated as:
-            "max" --> the max of the n values
-            "mean" --> the average of the n values
     :param categories: (Dictionary) Maps phonemes to categories. Categories should be numerical and index from 0
     :return: (ndarray) m x n matrix describing unit activation for phonemes. m = # of phonemes or categories,
              n = # of units

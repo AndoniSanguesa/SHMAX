@@ -160,7 +160,7 @@ def generate_features(waveform, n_features=194, sr=1):
     return cochleagram(waveform, sr, n_features, 0, 7630, 1, strict=False, ret_mode="subband", no_hp_lp_filts=True)
 
 
-def generate_mat_for_all_data_in_dir(data_path, result_path):
+def generate_mat_for_all_data_in_dir(data_path, result_path, file_type="mat"):
     """
     Generates features and saves them as .mat files to desired path for each wav file in the path or subpaths.
     (Makes matlab readable data)
@@ -186,23 +186,28 @@ def generate_mat_for_all_data_in_dir(data_path, result_path):
                         cnt += 1
                         file_name = f"{speaker_name}_{file[:-8]}.mat"
                         file_path = speaker_path + file
-                        save_features_as_mat(file_path, f"{result_path}/{file_name}", sr=16000)
+                        save_features_as_mat(file_path, f"{result_path}/{file_name}", sr=16000, file_type=file_type)
 
 
-def save_features_as_mat(data_path, file_path, n_features=194, sr=1):
+def save_features_as_mat(wav_path, output_path=None, n_features=194, sr=16000, file_type="mat"):
     """
     Generates feature vector from cochleogram subbands and saves them to a provided path as a .mat file
 
-    :param data_path: (String) path to wav file
+    :param wav_path: (String) path to wav file
     :param file_path: (String) path to save .mat file to
     :param n_features: (int) number of features/subbands desired
     :param sr: (int) sampling rate that original wav was recorded in
     :return: None
     """
 
-    _, waveform = wavfile.read(data_path)
+    _, waveform = wavfile.read(wav_path)
     to_mat = generate_features(waveform, n_features, sr)
-    savemat(file_path, {"data": to_mat})
+    if output_path:
+        if file_type == "mat":
+            savemat(output_path, {"data": to_mat})
+        elif file_type == "npy":
+            np.save(output_path, to_mat)
+    return to_mat
 
 
 def save_coch_to_file(coch, wav_len=None, wav_path=None, train=None, region=None, speaker=None,

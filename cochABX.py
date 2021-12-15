@@ -22,12 +22,12 @@ def convert_category_list_to_dict(categories):
     return ret_dict
 
 
-def generate_phoneme_files(corpus_data_path, data_path, result_path):
+def generate_phoneme_matrices(corpus_data_path, phoneme_feature_path, result_path):
     """
     Saves a .mat file for every phoneme pronounced  in the timit corpus
 
     :param corpus_data_path: (String) Path to the corpus data
-    :param data_path: (String) path to phoneme features
+    :param phoneme_feature_path: (String) path to phoneme features
     :param result_path: (String) path to save phoneme files to
     :return: None
     """
@@ -36,11 +36,11 @@ def generate_phoneme_files(corpus_data_path, data_path, result_path):
     phoneme_counter = [0]*len(ORDERED_PHONEMES)
     cnt = 0
 
-    for file in os.listdir(data_path):
+    for file in os.listdir(phoneme_feature_path):
         print(cnt)
         phone_times = get_phoneme_times(corpus_data_path, file[:-4])
 
-        data = loadmat(f"{data_path}/{file}")["data"]
+        data = loadmat(f"{phoneme_feature_path}/{file}")["data"]
         for phone, time in phone_times:
             phone_ind = ORDERED_PHONEMES.index(phone)
             new_mat = data[:, time[0]:time[1]]
@@ -63,12 +63,12 @@ def abx_distance(stim1, stim2, ):
     """
 
 
-def abx_testing(data_path, categories, num_categories, result_path=None, method="cosine", iter=100):
+def abx_testing(phoneme_mat_path, categories, num_categories, result_path=None, method="cosine", iter=100):
     """
     Performs machine ABX discrimination for all catagories against each other category. Creates confusion matrix based
     on results.
 
-    :param data_path: (String) Path to phoneme matrices
+    :param phoneme_mat_path: (String) Path to phoneme matrices
     :param categories: (Dictionary) Maps phonemes to categories. Categories should be numerical and index from 0
     :param num_categories: (int) Number of categories represented by `categories`
     :param result_path: (String) Saves confusion matrix as .mat file to the desired path. If None, no matrix is saved
@@ -82,21 +82,21 @@ def abx_testing(data_path, categories, num_categories, result_path=None, method=
     conf_mat = np.zeros((num_categories, num_categories))
     category_pops = [[] for _ in range(num_categories)]
 
-    for file in os.listdir(data_path):
+    for file in os.listdir(phoneme_mat_path):
         phone = file.split("_")[0]
         category_pops[categories[phone]].append(file)
     for i in range(num_categories):
         for ind in range(iter):
-            a = loadmat(f"{data_path}/{np.random.choice(category_pops[i])}")['data'].T
-            x = loadmat(f"{data_path}/{np.random.choice(category_pops[i])}")['data'].T
+            a = loadmat(f"{phoneme_mat_path}/{np.random.choice(category_pops[i])}")['data'].T
+            x = loadmat(f"{phoneme_mat_path}/{np.random.choice(category_pops[i])}")['data'].T
             while x.shape == a.shape and (x == a).all():
-                x = loadmat(f"{data_path}/{np.random.choice(category_pops[i])}")['data'].T
+                x = loadmat(f"{phoneme_mat_path}/{np.random.choice(category_pops[i])}")['data'].T
             dist_from_a = dtw(a, x, method).normalizedDistance
             for j in range(num_categories):
                 if j == i:
                     continue
                 for ind2 in range(iter):
-                    b = loadmat(f"{data_path}/{np.random.choice(category_pops[j])}")['data'].T
+                    b = loadmat(f"{phoneme_mat_path}/{np.random.choice(category_pops[j])}")['data'].T
 
                     dist_from_b = dtw(b, x, method).normalizedDistance
                     if dist_from_a < dist_from_b:
